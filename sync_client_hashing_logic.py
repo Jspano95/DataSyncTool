@@ -192,13 +192,13 @@ class FileFingerprint:
         return [chunk.digest for chunk in self.chunks]
 
 
-def fingerprint_stream(read: Callable[[int], bytes],
-                       policy: ChunkingPolicy = DEFAULT_POLICY) -> FileFingerprint:
+def fingerprint_stream(
+        read: Callable[[int], bytes],
+        policy: ChunkingPolicy = DEFAULT_POLICY
+        ) -> FileFingerprint:
     """both chunk and hash a stream of bytes in a cruicially (single) pass.
-
     read(n) must behave like file.read(n); return up to (n) bytes, or (b) at the end. 
     The function keeps only about one maximum-size chunk in memory at a time, so it handles files of any size
-
     The whole-file digest is fed the same bytes as the chunker as they go past, which is why the file is read from disk (exactly) once.
     """
     whole_file_hasher = hashlib.sha256()
@@ -208,7 +208,7 @@ def fingerprint_stream(read: Callable[[int], bytes],
     end_of_stream = False
 
     while True:
-        # Keep enough bytes buffered that a chunk never straddles a read.
+        # Keep enough bytes buffered that a chunk never straddles a read
         while not end_of_stream and len(buffer) < policy.maximum_size:
             more = read(policy.maximum_size)
             if not more:
@@ -217,7 +217,7 @@ def fingerprint_stream(read: Callable[[int], bytes],
                 buffer.extend(more)
 
         if not buffer:
-            break                                   # nothing left: we are done
+            break                                   # nothing left / done
 
         chunk_length = find_chunk_boundary(bytes(buffer), policy)
         chunk_bytes = bytes(buffer[:chunk_length])
